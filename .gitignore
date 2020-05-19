@@ -1,0 +1,11 @@
+/node_modules
+/uploads/images/others
+/.history
+/.documents
+/.backups
+/uploads
+# /sslkeys
+/.vscode
+npm-debug.log
+**/*.bak
+/logs/*
