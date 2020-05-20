@@ -1,7 +1,7 @@
 {
-  "name": "dynamic_socket_server",
+  "name": "file-method-server",
   "version": "1.0.0",
-  "description": "dynamic socket.io server",
+  "description": "server based on file/method path with socket",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
