@@ -1,36 +1,39 @@
 var io = require("socket.io-client");
-import serverconfig from "../config/index";
+
 var reqId = 1;
 var socket;
 
-var socketreconnect = function socketreconnect() {
+var connect = function connect(url,token=null) {
+  return new Promise(resolve=>{
+
+  
   if (socket) {
     socket.disconnect();
     socket.io.opts.query = {
-      api_token: window.localStorage.getItem("api_token") || null,
+      api_token: token,
     };
     socket.connect();
-    return;
+  }else{
+    socket = io.connect(url, {
+      upgrade: false,
+      transports: ["websocket"],
+      reconnect: true,
+      query: { api_token: token },
+    });
+
   }
-  socket = io.connect(serverconfig.socket.url + serverconfig.socket.namespace, {
-    upgrade: false,
-    transports: ["websocket"],
-    reconnect: true,
-    query: { api_token: window.localStorage.getItem("api_token") || null },
-  });
   socket.on("connect", function () {
-    console.log("socket connected to:", serverconfig.socket.url);
+    console.log("socket connected to:", url);
+    resolve(socket);
   });
 
   socket.on("reconnect", function () {});
   socket.on("disconnect", function () {});
-  socket.on("force_reconnect", socketreconnect);
-  return socket;
+  socket.on("force_reconnect", ()=>connect(url));
+})
 };
 
-socketreconnect();
-
-var socketcall = async (event, data = {}, options = {}) => {
+var call = async function call(event, data = {}, options = {}){
   options.timeout = options.timeout || 8000;
   reqId = reqId > 100000 ? 1 : reqId;
   reqId = options.reqId || reqId + 1;
@@ -46,15 +49,15 @@ var socketcall = async (event, data = {}, options = {}) => {
     } else if (options.persistance) {
       setTimeout(
         async () =>
-          resolve(await socketcall(event, data, { ...options, reqId })),
+          resolve(await call(event, data, { ...options, reqId })),
         1000
       );
     }
   });
 };
 
-export default {
+module.exports =  {
   socket,
-  socketcall,
-  socketreconnect,
+  call,
+  connect,
 };

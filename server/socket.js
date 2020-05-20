@@ -48,7 +48,6 @@ exp.socket_init = function (io, appmethods, app_guard,nameSpace) {
       console.log("Error in /sockets/driver.js---------->>>>", e);
     }
   });
-
   return Object.keys(io.nsps);
 };
 
